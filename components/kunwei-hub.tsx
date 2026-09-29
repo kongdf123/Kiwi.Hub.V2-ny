@@ -34,7 +34,18 @@ import {
   Zap,
 } from 'lucide-react'
 
-type View = 'home' | 'athletes' | 'testing' | 'dashboard' | 'reports' | 'management' | 'sessions' | 'sources' | 'sync' | 'api'
+type View = 'home' | 'athletes' | 'testing' | 'library' | 'dashboard' | 'reports' | 'management' | 'sessions' | 'sources' | 'sync' | 'api'
+
+type Protocol = { sport: string; category: string; name: string; description: string; source: string; metrics: string[]; icon: typeof Activity }
+
+const protocols: Protocol[] = [
+  { sport: 'JUMP', category: '跳跃', name: 'CMJ', description: '反向跳跃 · Force-time signal', source: 'Kunwei Force Plate', metrics: ['Jump Height', 'Peak Force', 'RSI-mod'], icon: Activity },
+  { sport: 'SPRINT', category: '短跑', name: '30m Sprint', description: '分段计时 · 5m / 10m / 20m / 30m', source: 'Kunwei Sprint App', metrics: ['Max Velocity', 'Acceleration', '30m Time'], icon: Zap },
+  { sport: 'SWIMMING', category: '游泳', name: '100m Freestyle', description: '泳道计时 · Split times', source: 'Partner Timing System', metrics: ['Reaction', '100m Time', 'Average Velocity'], icon: Activity },
+  { sport: 'STRENGTH', category: '力量', name: 'IMTP', description: '等长中拉 · Force-time signal', source: 'Kunwei Force Plate', metrics: ['Peak Force', 'RFD', 'Impulse'], icon: Gauge },
+  { sport: 'ATHLETICS', category: '田径', name: 'High Jump', description: '多次尝试 · Success / failure', source: 'Manual entry', metrics: ['Best Height', 'Attempts', 'Clearance Rate'], icon: Layers3 },
+  { sport: 'JUMP', category: '跳跃', name: 'Long Jump', description: '助跑跳远 · Attempt data', source: 'Manual entry', metrics: ['Best Distance', 'Attempts', 'Personal Best'], icon: Activity },
+]
 
 const athletes = [
   { name: 'Zhang Wei', initials: 'ZW', team: 'Senior Men\'s Team', position: 'Forward', last: '今天 09:42', metric: '52.4 cm', status: 'attention', change: '-12.4%' },
@@ -65,6 +76,7 @@ function Sidebar({ view, setView }: { view: View; setView: (view: View) => void 
   const primary = [
     { id: 'home' as View, label: '首页', icon: LayoutDashboard },
     { id: 'sessions' as View, label: '测试会话', icon: ClipboardList },
+    { id: 'library' as View, label: '测试协议库', icon: Layers3 },
     { id: 'athletes' as View, label: '运动员', icon: Users },
     { id: 'dashboard' as View, label: '分析仪表盘', icon: BarChart3 },
     { id: 'reports' as View, label: '报告', icon: FileText },
@@ -86,7 +98,7 @@ function Sidebar({ view, setView }: { view: View; setView: (view: View) => void 
 }
 
 function Topbar({ view, setView }: { view: View; setView: (view: View) => void }) {
-  const titles: Record<View, [string, string]> = { home: ['首页', '中央数据平台概览'], athletes: ['运动员', '统一查看跨项目表现'], testing: ['采集入口', '连接 Kunwei 客户端或开始一次 Hub 测试'], sessions: ['测试会话', '所有来源的原始数据、处理与分析状态'], dashboard: ['分析仪表盘', 'Senior Men\'s Team · 最近 30 天'], reports: ['报告', '生成和管理表现报告'], sync: ['同步中心', '追踪接收、验证、处理与发布'], sources: ['数据源', '管理客户端、设备与合作伙伴系统'], api: ['API 集成', '版本化 API 与事件通知'], management: ['管理中心', '组织、用户、设备与协议'] }
+  const titles: Record<View, [string, string]> = { home: ['首页', '中央数据平台概览'], athletes: ['运动员', '统一查看跨项目表现'], testing: ['采集入口', '选择运动员、协议与数据源，开始一次 Hub 测试'], library: ['测试协议库', 'Protocol-driven test library · 适配不同运动、数据结构与来源'], sessions: ['测试会话', '所有来源的原始数据、处理与分析状态'], dashboard: ['分析仪表盘', 'Senior Men\'s Team · 最近 30 天'], reports: ['报告', '生成和管理表现报告'], sync: ['同步中心', '追踪接收、验证、处理与发布'], sources: ['数据源', '管理客户端、设备与合作伙伴系统'], api: ['API 集成', '版本化 API 与事件通知'], management: ['管理中心', '组织、用户、设备与协议'] }
   return <header className="topbar"><div className="mobile-brand"><Logo /><strong>KUNWEI</strong></div><div className="page-heading"><h1>{titles[view][0]}</h1><span>{titles[view][1]}</span></div><div className="top-actions"><label className="global-search"><Search size={17} /><input placeholder="搜索运动员、测试..." aria-label="全局搜索" /></label><button className="icon-button" aria-label="通知"><Bell size={18} /><i /></button><button className="icon-button help" aria-label="帮助"><CircleHelp size={18} /></button><div className="top-user"><div className="user-avatar small">JW</div><ChevronDown size={14} /></div></div></header>
 }
 
@@ -109,6 +121,13 @@ function AthletesView({ setView }: { setView: (view: View) => void }) {
   const [query, setQuery] = useState('')
   const filtered = athletes.filter(a => a.name.toLowerCase().includes(query.toLowerCase()))
   return <div className="content"><div className="page-actions"><div><div className="eyebrow">ATHLETE DIRECTORY</div><h2>运动员</h2><p>共 32 名运动员 · 28 名本周已测试</p></div><div className="action-group"><button className="secondary-button"><Download size={16} />导入</button><button className="primary-button" onClick={() => setView('testing')}><Plus size={17} />添加运动员</button></div></div><section className="panel table-panel"><div className="table-toolbar"><label className="table-search"><Search size={17} /><input value={query} onChange={e => setQuery(e.target.value)} placeholder="搜索姓名或 ID" /></label><div className="filter-group"><button className="filter-button">团队：全部 <ChevronDown size={15} /></button><button className="filter-button">状态：全部 <ChevronDown size={15} /></button><button className="icon-button"><SlidersHorizontal size={17} /></button></div></div><div className="table-scroll"><table><thead><tr><th>运动员</th><th>团队</th><th>位置</th><th>最近测试</th><th>最新结果</th><th>状态</th><th aria-label="操作" /></tr></thead><tbody>{filtered.map(a => <tr key={a.name} onClick={() => setView('dashboard')}><td><div className="table-athlete"><div className="athlete-avatar">{a.initials}</div><div><strong>{a.name}</strong><span>ID · KW-{a.initials}024</span></div></div></td><td>{a.team}</td><td>{a.position}</td><td>{a.last}</td><td><strong>{a.metric}</strong><span className={a.change.startsWith('-') ? 'negative' : 'positive'}>{a.change}</span></td><td><StatusBadge status={a.status as keyof typeof statusMap} /></td><td><MoreHorizontal size={17} className="muted-icon" /></td></tr>)}</tbody></table></div><div className="pagination"><span>显示 1–6，共 32 名运动员</span><div><button className="page-number active">1</button><button className="page-number">2</button><button className="page-number">3</button><button className="page-number"><ChevronRight size={15} /></button></div></div></section></div>
+}
+
+function ProtocolLibraryView({ setView }: { setView: (view: View) => void }) {
+  const [query, setQuery] = useState('')
+  const [sport, setSport] = useState('全部')
+  const filtered = protocols.filter(protocol => protocol.name.toLowerCase().includes(query.toLowerCase()) && (sport === '全部' || protocol.category === sport))
+  return <div className="content"><div className="page-actions"><div><div className="eyebrow">PROTOCOL-DRIVEN TEST LIBRARY</div><h2>测试协议库</h2><p>从数百个协议中选择，Hub 会根据协议自动生成采集、指标和报告界面。</p></div><button className="primary-button" onClick={() => setView('testing')}><Plus size={17} />开始测试</button></div><section className="panel library-panel"><div className="library-toolbar"><label className="table-search"><Search size={17} /><input value={query} onChange={event => setQuery(event.target.value)} placeholder="搜索协议名称、运动或指标" /></label><div className="filter-group"><button className={`filter-button ${sport === '全部' ? 'selected-filter' : ''}`} onClick={() => setSport('全部')}>全部</button><button className={`filter-button ${sport === '跳跃' ? 'selected-filter' : ''}`} onClick={() => setSport('跳跃')}>跳跃</button><button className={`filter-button ${sport === '短跑' ? 'selected-filter' : ''}`} onClick={() => setSport('短跑')}>短跑</button><button className={`filter-button ${sport === '游泳' ? 'selected-filter' : ''}`} onClick={() => setSport('游泳')}>游泳</button><button className={`filter-button ${sport === '力量' ? 'selected-filter' : ''}`} onClick={() => setSport('力量')}>力量</button></div></div><div className="protocol-grid">{filtered.map(protocol => <article className="protocol-card" key={protocol.name}><div className="protocol-card-top"><div className="card-icon teal"><protocol.icon size={20} /></div><span className="protocol-sport">{protocol.sport}</span></div><h3>{protocol.name}</h3><p>{protocol.description}</p><div className="protocol-meta"><span>{protocol.source}</span><span>{protocol.metrics.length} 个指标</span></div><div className="protocol-tags">{protocol.metrics.map(metric => <span key={metric}>{metric}</span>)}</div><button className="secondary-button full-button" onClick={() => setView('testing')}>使用此协议 <ChevronRight size={15} /></button></article>)}</div></section></div>
 }
 
 function TestingView({ setView }: { setView: (view: View) => void }) {
@@ -137,7 +156,7 @@ function ManagementView() { return <div className="content"><div className="page
 
 export default function KunweiHub() {
   const [view, setView] = useState<View>('home')
-  return <div className="app-shell"><Sidebar view={view} setView={setView} /><div className="main-area"><Topbar view={view} setView={setView} /><main>{view === 'home' && <HomeView setView={setView} />}{view === 'athletes' && <AthletesView setView={setView} />}{view === 'testing' && <TestingView setView={setView} />}{view === 'sessions' && <SessionsView setView={setView} />}{view === 'dashboard' && <DashboardView />}{view === 'reports' && <ReportsView />}{view === 'sync' && <SyncView />}{view === 'sources' && <SourcesView setView={setView} />}{view === 'api' && <ApiView />}{view === 'management' && <ManagementView />}</main></div><button className="mobile-menu" aria-label="打开菜单"><Menu size={20} /></button></div>
+  return <div className="app-shell"><Sidebar view={view} setView={setView} /><div className="main-area"><Topbar view={view} setView={setView} /><main>{view === 'home' && <HomeView setView={setView} />}{view === 'athletes' && <AthletesView setView={setView} />}{view === 'testing' && <TestingView setView={setView} />}{view === 'library' && <ProtocolLibraryView setView={setView} />}{view === 'sessions' && <SessionsView setView={setView} />}{view === 'dashboard' && <DashboardView />}{view === 'reports' && <ReportsView />}{view === 'sync' && <SyncView />}{view === 'sources' && <SourcesView setView={setView} />}{view === 'api' && <ApiView />}{view === 'management' && <ManagementView />}</main></div><button className="mobile-menu" aria-label="打开菜单"><Menu size={20} /></button></div>
 }
 
 export { KunweiHub }
