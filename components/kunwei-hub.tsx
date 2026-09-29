@@ -1,0 +1,127 @@
+'use client'
+
+import { useState } from 'react'
+import {
+  Activity,
+  AlertTriangle,
+  BarChart3,
+  Bell,
+  ChevronDown,
+  ChevronRight,
+  CircleHelp,
+  ClipboardList,
+  Clock3,
+  Download,
+  FileText,
+  Gauge,
+  LayoutDashboard,
+  Menu,
+  MoreHorizontal,
+  Plus,
+  Search,
+  Settings2,
+  ShieldCheck,
+  SlidersHorizontal,
+  UserRound,
+  Users,
+  Wifi,
+  X,
+  Zap,
+} from 'lucide-react'
+
+type View = 'home' | 'athletes' | 'testing' | 'dashboard' | 'reports' | 'management'
+
+const athletes = [
+  { name: 'Zhang Wei', initials: 'ZW', team: 'Senior Men\'s Team', position: 'Forward', last: '今天 09:42', metric: '52.4 cm', status: 'attention', change: '-12.4%' },
+  { name: 'Li Ming', initials: 'LM', team: 'Senior Men\'s Team', position: 'Midfielder', last: '今天 09:37', metric: '2,980 N', status: 'warning', change: '13.2%' },
+  { name: 'Wang Hao', initials: 'WH', team: 'Senior Men\'s Team', position: 'Defender', last: '今天 09:15', metric: '48.1 cm', status: 'normal', change: '+4.8%' },
+  { name: 'Chen Jie', initials: 'CJ', team: 'U21', position: 'Goalkeeper', last: '14 天前', metric: '—', status: 'attention', change: '未测试' },
+  { name: 'Liu Yang', initials: 'LY', team: 'Senior Men\'s Team', position: 'Forward', last: '昨天 16:20', metric: '51.2 cm', status: 'normal', change: '+2.1%' },
+  { name: 'Zhao Rui', initials: 'ZR', team: 'U21', position: 'Midfielder', last: '昨天 15:04', metric: '46.8 cm', status: 'normal', change: '+6.7%' },
+]
+
+const statusMap = {
+  normal: { label: '正常', className: 'status-normal' },
+  warning: { label: '关注', className: 'status-warning' },
+  attention: { label: '需处理', className: 'status-attention' },
+  offline: { label: '离线', className: 'status-offline' },
+}
+
+function StatusBadge({ status }: { status: keyof typeof statusMap }) {
+  const item = statusMap[status]
+  return <span className={`status-badge ${item.className}`}><span className="status-dot" />{item.label}</span>
+}
+
+function Logo() {
+  return <div className="brand-mark"><span /><span /><span /></div>
+}
+
+function Sidebar({ view, setView }: { view: View; setView: (view: View) => void }) {
+  const primary = [
+    { id: 'home' as View, label: '首页', icon: LayoutDashboard },
+    { id: 'athletes' as View, label: '运动员', icon: Users },
+    { id: 'testing' as View, label: '测试', icon: Activity },
+    { id: 'dashboard' as View, label: '仪表盘', icon: BarChart3 },
+    { id: 'reports' as View, label: '报告', icon: FileText },
+  ]
+  return <aside className="sidebar">
+    <div className="brand"><Logo /><div><strong>KUNWEI</strong><small>PERFORMANCE HUB</small></div></div>
+    <div className="org-switcher"><div className="org-avatar">KP</div><div><strong>Kunwei Performance</strong><span>Senior Men's Team</span></div><ChevronDown size={15} /></div>
+    <nav className="nav-list" aria-label="主导航">
+      <span className="nav-label">工作区</span>
+      {primary.map(item => <button key={item.id} onClick={() => setView(item.id)} className={`nav-item ${view === item.id ? 'active' : ''}`}><item.icon size={18} /><span>{item.label}</span>{item.id === 'athletes' && <em>32</em>}</button>)}
+      <span className="nav-label management-label">管理</span>
+      <button onClick={() => setView('management')} className={`nav-item ${view === 'management' ? 'active' : ''}`}><Settings2 size={18} /><span>管理中心</span><ChevronRight size={15} className="nav-chevron" /></button>
+    </nav>
+    <div className="sidebar-bottom"><div className="sync-box"><Wifi size={15} /><div><strong>数据已同步</strong><span>刚刚更新</span></div></div><div className="profile"><div className="user-avatar">JW</div><div><strong>John Wu</strong><span>Performance Coach</span></div><MoreHorizontal size={16} /></div></div>
+  </aside>
+}
+
+function Topbar({ view, setView }: { view: View; setView: (view: View) => void }) {
+  const titles: Record<View, [string, string]> = { home: ['首页', '概览与需要关注的运动员'], athletes: ['运动员', '管理运动员与查看表现'], testing: ['测试', '记录一次新的测量'], dashboard: ['团队仪表盘', 'Senior Men\'s Team · 最近 30 天'], reports: ['报告', '生成和管理表现报告'], management: ['管理中心', '组织、用户、设备与协议'] }
+  return <header className="topbar"><div className="mobile-brand"><Logo /><strong>KUNWEI</strong></div><div className="page-heading"><h1>{titles[view][0]}</h1><span>{titles[view][1]}</span></div><div className="top-actions"><label className="global-search"><Search size={17} /><input placeholder="搜索运动员、测试..." aria-label="全局搜索" /></label><button className="icon-button" aria-label="通知"><Bell size={18} /><i /></button><button className="icon-button help" aria-label="帮助"><CircleHelp size={18} /></button><div className="top-user"><div className="user-avatar small">JW</div><ChevronDown size={14} /></div></div></header>
+}
+
+function MetricCard({ label, value, unit, trend, trendClass = 'up', icon: Icon }: { label: string; value: string; unit?: string; trend: string; trendClass?: string; icon: typeof Activity }) {
+  return <article className="metric-card"><div className="metric-top"><span>{label}</span><div className="metric-icon"><Icon size={16} /></div></div><div className="metric-value">{value}<small>{unit}</small></div><div className={`metric-trend ${trendClass}`}>{trend}</div></article>
+}
+
+function TrendChart({ compact = false }: { compact?: boolean }) {
+  return <div className={`trend-chart ${compact ? 'compact' : ''}`}><div className="chart-grid"><svg viewBox="0 0 700 190" preserveAspectRatio="none" role="img" aria-label="CMJ 跳高趋势图"><path d="M0 150 C45 132, 70 145, 110 118 S175 125, 210 105 S265 117, 300 88 S360 105, 400 94 S450 75, 495 82 S540 60, 580 68 S630 48, 700 42" fill="none" stroke="#1d8a78" strokeWidth="3" /><path d="M0 150 C45 132, 70 145, 110 118 S175 125, 210 105 S265 117, 300 88 S360 105, 400 94 S450 75, 495 82 S540 60, 580 68 S630 48, 700 42 L700 190 L0 190Z" fill="url(#area)" opacity=".28" /><defs><linearGradient id="area" x1="0" x2="0" y1="0" y2="1"><stop stopColor="#1d8a78" /><stop offset="1" stopColor="#1d8a78" stopOpacity="0" /></linearGradient></defs></svg></div>{!compact && <div className="chart-labels"><span>01 Sep</span><span>08 Sep</span><span>15 Sep</span><span>22 Sep</span><span>29 Sep</span></div>}</div>
+}
+
+function HomeView({ setView }: { setView: (view: View) => void }) {
+  return <div className="content"><div className="welcome-row"><div><div className="eyebrow">MONDAY, 29 SEP 2026</div><h2>早上好，John</h2><p>这是今天团队表现的概览。以下运动员可能需要你的关注。</p></div><button className="primary-button" onClick={() => setView('testing')}><Plus size={17} />开始测试</button></div><div className="metric-grid"><MetricCard label="运动员" value="32" trend="+2 本月" icon={Users} /><MetricCard label="本周已测试" value="28" trend="87.5% 覆盖率" icon={ClipboardList} /><MetricCard label="需要关注" value="4" trend="较上周 −1" trendClass="down" icon={AlertTriangle} /><MetricCard label="今日测试" value="16" trend="+4 较昨日" icon={Zap} /></div><div className="home-grid"><section className="panel attention-panel"><div className="panel-heading"><div><h3>需要关注</h3><span>基于个人基线与阈值</span></div><button className="text-button" onClick={() => setView('athletes')}>查看全部 <ChevronRight size={15} /></button></div><div className="attention-list"><AttentionRow athlete="Zhang Wei" metric="CMJ 跳高" detail="较基线下降 12.4%" status="attention" /><AttentionRow athlete="Li Ming" metric="双侧不对称" detail="13.2% · 高于阈值" status="warning" /><AttentionRow athlete="Chen Jie" metric="测试逾期" detail="已有 14 天未完成测试" status="attention" /></div></section><section className="panel recent-panel"><div className="panel-heading"><div><h3>最近测试</h3><span>今天 · 3 个已完成</span></div><button className="icon-button"><MoreHorizontal size={18} /></button></div><div className="recent-list"><RecentRow time="09:42" name="Zhang Wei" test="CMJ" result="52.4 cm" /><RecentRow time="09:37" name="Li Ming" test="IMTP" result="2,980 N" /><RecentRow time="09:15" name="Wang Hao" test="CMJ" result="48.1 cm" /></div></section></div><section className="panel trend-panel"><div className="panel-heading"><div><h3>团队趋势</h3><span>CMJ 跳高 · Senior Men's Team · 最近 30 天 · 单位：cm</span></div><button className="filter-button">CMJ 跳高 <ChevronDown size={15} /></button></div><div className="chart-summary"><strong>48.2 <small>cm</small></strong><span className="positive">↑ 3.4% <small>vs 上一周期</small></span></div><TrendChart /></section></div>
+}
+
+function AttentionRow({ athlete, metric, detail, status }: { athlete: string; metric: string; detail: string; status: 'attention' | 'warning' }) { return <div className="attention-row"><div className="athlete-avatar">{athlete.split(' ').map(v => v[0]).join('')}</div><div className="row-main"><strong>{athlete}</strong><span>{metric}</span></div><div className="row-detail">{detail}</div><StatusBadge status={status} /><ChevronRight size={16} className="muted-icon" /></div> }
+function RecentRow({ time, name, test, result }: { time: string; name: string; test: string; result: string }) { return <div className="recent-row"><span className="time">{time}</span><strong>{name}</strong><span className="test-pill">{test}</span><span className="result">{result}</span><ChevronRight size={15} className="muted-icon" /></div> }
+
+function AthletesView({ setView }: { setView: (view: View) => void }) {
+  const [query, setQuery] = useState('')
+  const filtered = athletes.filter(a => a.name.toLowerCase().includes(query.toLowerCase()))
+  return <div className="content"><div className="page-actions"><div><div className="eyebrow">ATHLETE DIRECTORY</div><h2>运动员</h2><p>共 32 名运动员 · 28 名本周已测试</p></div><div className="action-group"><button className="secondary-button"><Download size={16} />导入</button><button className="primary-button" onClick={() => setView('testing')}><Plus size={17} />添加运动员</button></div></div><section className="panel table-panel"><div className="table-toolbar"><label className="table-search"><Search size={17} /><input value={query} onChange={e => setQuery(e.target.value)} placeholder="搜索姓名或 ID" /></label><div className="filter-group"><button className="filter-button">团队：全部 <ChevronDown size={15} /></button><button className="filter-button">状态：全部 <ChevronDown size={15} /></button><button className="icon-button"><SlidersHorizontal size={17} /></button></div></div><div className="table-scroll"><table><thead><tr><th>运动员</th><th>团队</th><th>位置</th><th>最近测试</th><th>最新结果</th><th>状态</th><th aria-label="操作" /></tr></thead><tbody>{filtered.map(a => <tr key={a.name} onClick={() => setView('dashboard')}><td><div className="table-athlete"><div className="athlete-avatar">{a.initials}</div><div><strong>{a.name}</strong><span>ID · KW-{a.initials}024</span></div></div></td><td>{a.team}</td><td>{a.position}</td><td>{a.last}</td><td><strong>{a.metric}</strong><span className={a.change.startsWith('-') ? 'negative' : 'positive'}>{a.change}</span></td><td><StatusBadge status={a.status as keyof typeof statusMap} /></td><td><MoreHorizontal size={17} className="muted-icon" /></td></tr>)}</tbody></table></div><div className="pagination"><span>显示 1–6，共 32 名运动员</span><div><button className="page-number active">1</button><button className="page-number">2</button><button className="page-number">3</button><button className="page-number"><ChevronRight size={15} /></button></div></div></section></div>
+}
+
+function TestingView({ setView }: { setView: (view: View) => void }) {
+  const [step, setStep] = useState(1)
+  const [trial, setTrial] = useState(1)
+  const [captured, setCaptured] = useState<number[]>([])
+  const steps = ['选择运动员', '选择协议', '连接设备', '采集测试', '查看结果']
+  return <div className="content testing-content"><div className="testing-head"><div><div className="eyebrow">NEW TEST SESSION</div><h2>开始一次测试</h2><p>完成测试后，数据将自动保存并同步到运动员档案。</p></div><button className="quiet-button">保存并退出</button></div><div className="stepper">{steps.map((label, i) => <div key={label} className={`step ${i + 1 <= step ? 'done' : ''} ${i + 1 === step ? 'current' : ''}`}><span>{i + 1 < step ? '✓' : i + 1}</span><label>{label}</label></div>)}</div><div className="testing-layout"><section className="panel test-card"><div className="test-card-head"><div><span className="protocol-kicker">PROTOCOL · CMJ</span><h3>反向跳跃测试</h3></div><span className="session-id">SESSION · NEW</span></div>{step === 1 && <div className="selection-block"><label>选择运动员</label><button className="selection-button"><div className="athlete-avatar">ZW</div><div><strong>Zhang Wei</strong><span>Senior Men's Team · Forward</span></div><ChevronDown size={17} /></button><button className="selection-button muted-selection"><Users size={19} /><div><strong>选择其他运动员</strong><span>从团队目录中选择</span></div><ChevronRight size={17} /></button><button className="primary-button full-button" onClick={() => setStep(2)}>继续 <ChevronRight size={16} /></button></div>}{step === 2 && <div className="selection-block"><label>选择测试协议</label><button className="selection-button selected"><div className="protocol-icon"><Activity size={19} /></div><div><strong>CMJ · 反向跳跃</strong><span>3 次试跳 · 跳高、峰值力量、RSI-mod</span></div><span className="check">✓</span></button><button className="selection-button"><div className="protocol-icon neutral"><Gauge size={19} /></div><div><strong>IMTP · 等长中拉</strong><span>3 次试验 · 峰值力量、RFD</span></div><ChevronRight size={17} /></button><button className="primary-button full-button" onClick={() => setStep(3)}>继续 <ChevronRight size={16} /></button></div>}{step === 3 && <div className="selection-block"><label>连接测量设备</label><div className="device-status"><div className="device-orb"><Wifi size={25} /></div><div><strong>KW-FP-00124</strong><span>Kunwei Force Plate · 设备已连接</span></div><StatusBadge status="normal" /></div><div className="device-check"><ShieldCheck size={18} /><span>设备校准正常 · 固件 v2.4.1 · 最后同步：刚刚</span></div><button className="primary-button full-button" onClick={() => setStep(4)}>开始采集 <ChevronRight size={16} /></button></div>}{step === 4 && <div className="capture-block"><div className="capture-meta"><div><span className="protocol-kicker">CMJ · ZHANG WEI</span><h3>TRIAL {trial} <small>/ 3</small></h3></div><span className="capture-state"><i />设备就绪</span></div><div className="capture-stage"><div className="capture-ring"><Activity size={29} /><strong>{captured.includes(trial) ? '完成' : '准备'}</strong></div><span>{captured.includes(trial) ? '试跳已记录' : '站上测力台，准备开始'}</span></div>{captured.includes(trial) ? <div className="capture-result"><strong>跳高 <b>{trial === 1 ? '51.8' : trial === 2 ? '52.4' : '50.9'} cm</b></strong><span>峰值力量 {trial === 1 ? '2,105' : '2,134'} N</span></div> : <button className="start-button" onClick={() => setCaptured([...captured, trial])}><Zap size={20} />开始试跳</button>}{captured.includes(trial) && (trial < 3 ? <button className="primary-button full-button" onClick={() => { setTrial(trial + 1) }}>下一次试跳 <ChevronRight size={16} /></button> : <button className="primary-button full-button" onClick={() => { setStep(5); setView('dashboard') }}>完成并查看结果 <ChevronRight size={16} /></button>)}</div>}{step === 5 && <ResultPreview setView={setView} />}</section><aside className="panel session-sidebar"><div className="panel-heading"><div><h3>本次会话</h3><span>数据实时保存</span></div><Clock3 size={17} className="muted-icon" /></div><div className="session-athlete"><div className="athlete-avatar">ZW</div><div><strong>Zhang Wei</strong><span>Senior Men's Team</span></div></div><div className="session-info"><div><span>协议</span><strong>CMJ</strong></div><div><span>设备</span><strong>KW-FP-00124</strong></div><div><span>试跳</span><strong>{captured.length} / 3</strong></div></div><div className="trial-list">{[1, 2, 3].map(t => <div key={t} className={captured.includes(t) ? 'trial done' : 'trial'}><span>试跳 {t}</span>{captured.includes(t) ? <><strong>{t === 1 ? '51.8' : t === 2 ? '52.4' : '50.9'} cm</strong><span className="valid">有效</span></> : <span className="pending">待采集</span>}</div>)}</div><div className="safe-note"><ShieldCheck size={15} /><span>每次试跳都会被安全保存，原始信号不可变。</span></div></aside></div></div>
+}
+
+function ResultPreview({ setView }: { setView: (view: View) => void }) { return <div className="result-preview"><div className="result-banner"><ShieldCheck size={18} /><span>测试完成 · 数据已同步</span></div><div className="result-hero"><span className="protocol-kicker">CMJ RESULT · 29 SEP 2026, 09:42</span><div><strong>52.4</strong><span>cm<br />跳高</span></div></div><div className="result-metrics"><div><span>峰值力量</span><strong>2,134 N</strong></div><div><span>峰值功率</span><strong>4,920 W</strong></div><div><span>RSI-mod</span><strong>0.41</strong></div><div><span>不对称</span><strong>6.2%</strong></div></div><TrendChart compact /><button className="primary-button full-button" onClick={() => setView('dashboard')}>打开完整结果 <ChevronRight size={16} /></button></div> }
+
+function DashboardView() { return <div className="content"><div className="page-actions"><div><div className="eyebrow">TEAM PERFORMANCE</div><h2>Senior Men&apos;s Team</h2><p>团队表现 · 最近 30 天 · 32 名运动员</p></div><div className="action-group"><button className="secondary-button"><Download size={16} />导出数据</button><button className="primary-button"><Plus size={17} />添加组件</button></div></div><div className="dashboard-toolbar"><div className="tabs"><button className="tab active">概览</button><button className="tab">运动员</button><button className="tab">测试合规</button></div><button className="filter-button">最近 30 天 <ChevronDown size={15} /></button></div><div className="dashboard-metrics"><MetricCard label="CMJ 平均跳高" value="48.2" unit="cm" trend="↑ 3.4% vs 上周期" icon={Activity} /><MetricCard label="峰值力量" value="2,421" unit="N" trend="↑ 5.1% vs 上周期" icon={Zap} /><MetricCard label="测试覆盖率" value="87.5" unit="%" trend="28 / 32 名运动员" icon={ClipboardList} /><MetricCard label="需要关注" value="3" trend="较上周 −2" trendClass="down" icon={AlertTriangle} /></div><div className="dashboard-grid"><section className="panel large-chart"><div className="panel-heading"><div><h3>CMJ 跳高趋势</h3><span>Senior Men&apos;s Team · 最近 30 天 · 单位：cm</span></div><button className="filter-button">平均值 <ChevronDown size={15} /></button></div><div className="chart-summary"><strong>48.2 <small>cm</small></strong><span className="positive">↑ 3.4%</span></div><TrendChart /></section><section className="panel distribution"><div className="panel-heading"><div><h3>运动员状态</h3><span>基于最新测试结果</span></div></div><div className="donut-wrap"><div className="donut"><strong>32</strong><span>运动员</span></div><div className="legend"><span><i className="dot green" />正常 <b>24</b></span><span><i className="dot amber" />关注 <b>5</b></span><span><i className="dot red" />需处理 <b>3</b></span></div></div></section></div><section className="panel table-panel"><div className="panel-heading"><div><h3>运动员表现</h3><span>按 CMJ 跳高排序 · 最新有效结果</span></div><button className="text-button">查看全部 <ChevronRight size={15} /></button></div><div className="table-scroll"><table><thead><tr><th>运动员</th><th>CMJ 跳高</th><th>较基线</th><th>峰值力量</th><th>最近测试</th><th>状态</th></tr></thead><tbody>{athletes.slice(0, 4).map(a => <tr key={a.name}><td><div className="table-athlete"><div className="athlete-avatar">{a.initials}</div><strong>{a.name}</strong></div></td><td><strong>{a.metric}</strong></td><td className={a.change.startsWith('-') ? 'negative' : 'positive'}>{a.change}</td><td>{a.name === 'Zhang Wei' ? '2,134 N' : a.name === 'Li Ming' ? '2,980 N' : '2,416 N'}</td><td>{a.last}</td><td><StatusBadge status={a.status as keyof typeof statusMap} /></td></tr>)}</tbody></table></div></section></div> }
+
+function ReportsView() { return <div className="content"><div className="page-actions"><div><div className="eyebrow">REPORTING</div><h2>报告</h2><p>创建、预览和分享专业表现报告</p></div><button className="primary-button"><Plus size={17} />创建报告</button></div><div className="report-layout"><section className="panel report-builder"><div className="panel-heading"><div><h3>创建报告</h3><span>选择报告范围与指标</span></div><FileText size={19} className="muted-icon" /></div><div className="form-grid"><label>报告类型<select><option>运动员报告</option><option>团队报告</option></select></label><label>运动员 / 团队<select><option>Zhang Wei</option><option>Senior Men&apos;s Team</option></select></label><label>时间范围<select><option>最近 30 天</option><option>最近 90 天</option></select></label><label>比较基准<select><option>个人基线 + 团队平均</option><option>仅个人基线</option></select></label></div><div className="check-section"><label>报告指标</label><div className="checks"><span className="check-item checked">✓ <b>CMJ 跳高</b></span><span className="check-item checked">✓ <b>峰值力量</b></span><span className="check-item checked">✓ <b>RSI-mod</b></span><span className="check-item">＋ <b>不对称</b></span></div></div><button className="primary-button">生成报告 <ChevronRight size={16} /></button></section><section className="panel report-preview-card"><div className="preview-header"><span className="protocol-kicker">REPORT PREVIEW</span><button className="icon-button"><MoreHorizontal size={18} /></button></div><div className="report-paper"><div className="paper-brand"><Logo /><strong>KUNWEI HUB</strong></div><span className="paper-kicker">ATHLETE PERFORMANCE REPORT</span><h3>Zhang Wei</h3><p>Senior Men&apos;s Team · 01–29 Sep 2026</p><div className="paper-score"><strong>52.4 <small>cm</small></strong><span>CMJ 跳高<br /><b>↑ 5.2% vs 基线</b></span></div><div className="paper-lines"><i /><i /><i /><i /></div></div><div className="preview-actions"><button className="secondary-button"><Download size={16} />导出 PDF</button><button className="secondary-button">分享报告</button></div></section></div></div> }
+
+function ManagementView() { return <div className="content"><div className="page-actions"><div><div className="eyebrow">ADMINISTRATION</div><h2>管理中心</h2><p>Kunwei Performance Center · 组织设置</p></div><button className="primary-button"><Settings2 size={16} />组织设置</button></div><div className="management-grid"><div className="management-card"><div className="card-icon teal"><Users size={20} /></div><div><h3>用户与权限</h3><p>管理 8 位团队成员与角色</p></div><ChevronRight size={17} /></div><div className="management-card"><div className="card-icon blue"><Gauge size={20} /></div><div><h3>设备</h3><p>3 台设备 · 2 台在线</p></div><ChevronRight size={17} /></div><div className="management-card"><div className="card-icon amber"><ClipboardList size={20} /></div><div><h3>测试协议</h3><p>6 个标准化测试协议</p></div><ChevronRight size={17} /></div><div className="management-card"><div className="card-icon purple"><SlidersHorizontal size={20} /></div><div><h3>团队与分组</h3><p>2 个团队 · 5 个分组</p></div><ChevronRight size={17} /></div></div><section className="panel table-panel"><div className="panel-heading"><div><h3>设备状态</h3><span>所有已注册的 Kunwei 测量设备</span></div><button className="primary-button small"><Plus size={15} />注册设备</button></div><div className="table-scroll"><table><thead><tr><th>设备 ID</th><th>类型</th><th>状态</th><th>固件</th><th>电量</th><th>最后同步</th></tr></thead><tbody><tr><td><strong>KW-FP-00124</strong></td><td>Force Plate</td><td><StatusBadge status="normal" /></td><td>v2.4.1</td><td>94%</td><td>刚刚</td></tr><tr><td><strong>KW-FP-00125</strong></td><td>Force Plate</td><td><StatusBadge status="offline" /></td><td>v2.3.8</td><td>—</td><td>2 天前</td></tr><tr><td><strong>KW-FP-00126</strong></td><td>Force Plate</td><td><span className="status-badge status-processing"><span className="status-dot" />同步中</span></td><td>v2.4.1</td><td>76%</td><td>1 分钟前</td></tr></tbody></table></div></section></div> }
+
+export default function KunweiHub() {
+  const [view, setView] = useState<View>('home')
+  return <div className="app-shell"><Sidebar view={view} setView={setView} /><div className="main-area"><Topbar view={view} setView={setView} /><main>{view === 'home' && <HomeView setView={setView} />}{view === 'athletes' && <AthletesView setView={setView} />}{view === 'testing' && <TestingView setView={setView} />}{view === 'dashboard' && <DashboardView />}{view === 'reports' && <ReportsView />}{view === 'management' && <ManagementView />}</main></div><button className="mobile-menu" aria-label="打开菜单"><Menu size={20} /></button></div>
+}
+
+export { KunweiHub }
