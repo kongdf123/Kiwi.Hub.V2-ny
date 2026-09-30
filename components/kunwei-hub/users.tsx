@@ -1,0 +1,26 @@
+'use client'
+
+import { ArrowLeft, Check, Mail, MoreHorizontal, Plus, Search, ShieldCheck, UserRound, Users } from 'lucide-react'
+import { useState } from 'react'
+import { StatusBadge } from './shared'
+
+type Member = { name: string; initials: string; email: string; role: string; team: string; status: 'normal' | 'offline'; lastActive: string; permissions: string[] }
+
+const members: Member[] = [
+  { name: 'Alex Chen', initials: 'AC', email: 'alex.chen@kunwei.com', role: '管理员', team: 'Senior Men\'s Team', status: 'normal', lastActive: '刚刚在线', permissions: ['管理组织设置', '邀请和移除成员', '查看与导出全部数据', '管理设备与协议'] },
+  { name: 'Mia Wong', initials: 'MW', email: 'mia.wong@kunwei.com', role: 'Performance Coach', team: 'Senior Men\'s Team', status: 'normal', lastActive: '12 分钟前', permissions: ['查看团队数据', '创建测试会话', '生成报告'] },
+  { name: 'David Lin', initials: 'DL', email: 'david.lin@kunwei.com', role: '分析师', team: 'Senior Men\'s Team', status: 'normal', lastActive: '昨天 18:42', permissions: ['查看团队数据', '分析测试结果', '生成报告'] },
+  { name: 'Chris Zhang', initials: 'CZ', email: 'chris.zhang@kunwei.com', role: '设备管理员', team: 'Kunwei Performance', status: 'offline', lastActive: '3 天前', permissions: ['管理设备', '查看同步状态'] },
+]
+
+export function UsersView({ onBack }: { onBack: () => void }) {
+  const [query, setQuery] = useState('')
+  const [selected, setSelected] = useState<Member | null>(null)
+  const filtered = members.filter(member => `${member.name} ${member.email} ${member.role}`.toLowerCase().includes(query.toLowerCase()))
+
+  if (selected) return <div className="content"><button className="back-link" onClick={() => setSelected(null)}><ArrowLeft size={15} />返回用户与权限</button><div className="page-actions"><div><div className="eyebrow">MEMBER PROFILE</div><h2>{selected.name}</h2><p>{selected.email} · {selected.team}</p></div><button className="secondary-button"><MoreHorizontal size={16} />更多操作</button></div><div className="user-detail-grid"><section className="panel user-profile-card"><div className="user-detail-avatar">{selected.initials}</div><h3>{selected.name}</h3><span className="user-role">{selected.role}</span><div className="detail-status"><StatusBadge status={selected.status} /><span>{selected.lastActive}</span></div><button className="secondary-button full-button"><Mail size={15} />发送邀请邮件</button></section><section className="panel permission-card"><div className="panel-heading"><div><h3>权限与访问范围</h3><span>该成员可以执行的操作</span></div><ShieldCheck size={19} className="muted-icon" /></div><div className="permission-list">{selected.permissions.map(permission => <div key={permission}><span className="permission-check"><Check size={13} /></span><span>{permission}</span></div>)}</div><div className="detail-section"><span className="detail-label">所属团队</span><strong>{selected.team}</strong></div><div className="detail-section"><span className="detail-label">登录方式</span><strong>企业 SSO · 已验证</strong></div></section></div></div>
+
+  return <div className="content"><div className="page-actions"><div><div className="eyebrow">MEMBERS & ACCESS</div><h2>用户与权限</h2><p>管理团队成员、角色与数据访问范围 · 共 {members.length} 位成员</p></div><button className="primary-button"><Plus size={17} />邀请成员</button></div><section className="panel table-panel"><div className="table-toolbar"><label className="table-search"><Search size={17} /><input value={query} onChange={event => setQuery(event.target.value)} placeholder="搜索姓名、邮箱或角色" /></label><button className="filter-button">角色：全部</button></div><div className="table-scroll"><table><thead><tr><th>成员</th><th>角色</th><th>团队</th><th>状态</th><th>最近活跃</th><th aria-label="操作" /></tr></thead><tbody>{filtered.map(member => <tr className="clickable-row" key={member.email} onClick={() => setSelected(member)}><td><div className="table-athlete"><div className="athlete-avatar">{member.initials}</div><div><strong>{member.name}</strong><span>{member.email}</span></div></div></td><td><span className="role-pill">{member.role}</span></td><td>{member.team}</td><td><StatusBadge status={member.status} /></td><td>{member.lastActive}</td><td><MoreHorizontal size={17} className="muted-icon" /></td></tr>)}</tbody></table></div></section><section className="user-access-note"><Users size={18} /><div><strong>基于角色的访问控制</strong><span>使用角色快速管理权限。成员只能访问其所属团队的数据，所有操作都会记录在审计日志中。</span></div><ShieldCheck size={18} /></section></div>
+}
+
+export { members }

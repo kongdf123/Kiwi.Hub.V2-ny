@@ -1,7 +1,7 @@
 import { Activity, Gauge, Layers3, Zap } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
-export type View = 'home' | 'athletes' | 'testing' | 'library' | 'dashboard' | 'reports' | 'management' | 'sessions' | 'sources' | 'sync' | 'api'
+export type View = 'home' | 'athletes' | 'testing' | 'library' | 'dashboard' | 'reports' | 'management' | 'users' | 'sessions' | 'sources' | 'sync' | 'api'
 export type Status = 'normal' | 'warning' | 'attention' | 'offline'
 export type Protocol = { sport: string; category: string; name: string; description: string; source: string; metrics: string[]; icon: LucideIcon }
 
