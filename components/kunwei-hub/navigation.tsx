@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { BarChart3, Bell, CircleHelp, ClipboardList, Code2, Database, ChevronDown, ChevronRight, FileText, Layers3, LayoutDashboard, LogOut, MoreHorizontal, RefreshCw, Search, Settings2, Users, Wifi } from 'lucide-react'
 import { Logo } from './shared'
 import type { View } from './types'
@@ -26,6 +26,17 @@ export function Sidebar({ view, setView, onLogout }: { view: View; setView: (vie
 }
 
 export function Topbar({ view, onLogout }: { view: View; onLogout: () => void }) {
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const userMenuRef = useRef<HTMLDivElement>(null)
   const titles: Record<View, [string, string]> = { home: ['首页', '中央数据平台概览'], athletes: ['运动员', '统一查看跨项目表现'], testing: ['采集入口', '选择运动员、协议与数据源，开始一次 Hub 测试'], library: ['测试协议库', 'Protocol-driven test library · 适配不同运动、数据结构与来源'], sessions: ['测试会话', '所有来源的原始数据、处理与分析状态'], dashboard: ['分析仪表盘', 'Senior Men\'s Team · 最近 30 天'], reports: ['报告', '生成和管理表现报告'], sync: ['同步中心', '追踪接收、验证、处理与发布'], sources: ['数据源', '管理客户端、设备与合作伙伴系统'], api: ['API 集成', '版本化 API 与事件通知'], management: ['管理中心', '组织、用户、设备与协议'], users: ['用户与权限', '成员、角色与数据访问范围'] }
-  return <header className="topbar"><div className="mobile-brand"><Logo /><strong>KUNWEI</strong></div><div className="page-heading"><h1>{titles[view][0]}</h1><span>{titles[view][1]}</span></div><div className="top-actions"><label className="global-search"><Search size={17} /><input placeholder="搜索运动员、测试..." aria-label="全局搜索" /></label><button className="icon-button" aria-label="通知"><Bell size={18} /><i /></button><button className="icon-button help" aria-label="帮助"><CircleHelp size={18} /></button><button className="top-user" onClick={onLogout} aria-label="退出登录"><div className="user-avatar small">AC</div><div><strong>Alex Chen</strong><span>Performance Coach</span></div><LogOut size={14} /></button></div></header>
+
+  useEffect(() => {
+    const closeMenu = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) setUserMenuOpen(false)
+    }
+    document.addEventListener('mousedown', closeMenu)
+    return () => document.removeEventListener('mousedown', closeMenu)
+  }, [])
+
+  return <header className="topbar"><div className="mobile-brand"><Logo /><strong>KUNWEI</strong></div><div className="page-heading"><h1>{titles[view][0]}</h1><span>{titles[view][1]}</span></div><div className="top-actions"><label className="global-search"><Search size={17} /><input placeholder="搜索运动员、测试..." aria-label="全局搜索" /></label><button className="icon-button" aria-label="通知"><Bell size={18} /><i /></button><button className="icon-button help" aria-label="帮助"><CircleHelp size={18} /></button><div className="user-menu" ref={userMenuRef}><button className={`top-user ${userMenuOpen ? 'open' : ''}`} onClick={() => setUserMenuOpen(open => !open)} aria-expanded={userMenuOpen} aria-haspopup="menu" aria-label="打开用户菜单"><div className="user-avatar small">AC</div><div><strong>Alex Chen</strong><span>Performance Coach</span></div><ChevronDown size={15} className="user-menu-chevron" /></button>{userMenuOpen && <div className="user-dropdown" role="menu"><div className="user-dropdown-header"><div className="user-avatar">AC</div><div><strong>Alex Chen</strong><span>Alex@kunwei.com</span></div></div><div className="user-dropdown-divider" /><button role="menuitem" onClick={() => setUserMenuOpen(false)}>个人资料</button><button role="menuitem" onClick={() => setUserMenuOpen(false)}>账户设置</button><div className="user-dropdown-divider" /><button role="menuitem" className="logout-item" onClick={onLogout}><LogOut size={15} />退出登录</button></div>}</div></div></header>
 }
