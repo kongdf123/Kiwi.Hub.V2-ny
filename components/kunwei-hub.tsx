@@ -33,44 +33,9 @@ import {
   X,
   Zap,
 } from 'lucide-react'
+import { AttentionRow, Logo, MetricCard, RecentRow, StatusBadge, TrendChart } from './kunwei-hub/shared'
+import { athletes, protocols, statusMap, type View } from './kunwei-hub/types'
 
-type View = 'home' | 'athletes' | 'testing' | 'library' | 'dashboard' | 'reports' | 'management' | 'sessions' | 'sources' | 'sync' | 'api'
-
-type Protocol = { sport: string; category: string; name: string; description: string; source: string; metrics: string[]; icon: typeof Activity }
-
-const protocols: Protocol[] = [
-  { sport: 'JUMP', category: '跳跃', name: 'CMJ', description: '反向跳跃 · Force-time signal', source: 'Kunwei Force Plate', metrics: ['Jump Height', 'Peak Force', 'RSI-mod'], icon: Activity },
-  { sport: 'SPRINT', category: '短跑', name: '30m Sprint', description: '分段计时 · 5m / 10m / 20m / 30m', source: 'Kunwei Sprint App', metrics: ['Max Velocity', 'Acceleration', '30m Time'], icon: Zap },
-  { sport: 'SWIMMING', category: '游泳', name: '100m Freestyle', description: '泳道计时 · Split times', source: 'Partner Timing System', metrics: ['Reaction', '100m Time', 'Average Velocity'], icon: Activity },
-  { sport: 'STRENGTH', category: '力量', name: 'IMTP', description: '等长中拉 · Force-time signal', source: 'Kunwei Force Plate', metrics: ['Peak Force', 'RFD', 'Impulse'], icon: Gauge },
-  { sport: 'ATHLETICS', category: '田径', name: 'High Jump', description: '多次尝试 · Success / failure', source: 'Manual entry', metrics: ['Best Height', 'Attempts', 'Clearance Rate'], icon: Layers3 },
-  { sport: 'JUMP', category: '跳跃', name: 'Long Jump', description: '助跑跳远 · Attempt data', source: 'Manual entry', metrics: ['Best Distance', 'Attempts', 'Personal Best'], icon: Activity },
-]
-
-const athletes = [
-  { name: 'Zhang Wei', initials: 'ZW', team: 'Senior Men\'s Team', position: 'Forward', last: '今天 09:42', metric: '52.4 cm', status: 'attention', change: '-12.4%' },
-  { name: 'Li Ming', initials: 'LM', team: 'Senior Men\'s Team', position: 'Midfielder', last: '今天 09:37', metric: '2,980 N', status: 'warning', change: '13.2%' },
-  { name: 'Wang Hao', initials: 'WH', team: 'Senior Men\'s Team', position: 'Defender', last: '今天 09:15', metric: '48.1 cm', status: 'normal', change: '+4.8%' },
-  { name: 'Chen Jie', initials: 'CJ', team: 'U21', position: 'Goalkeeper', last: '14 天前', metric: '—', status: 'attention', change: '未测试' },
-  { name: 'Liu Yang', initials: 'LY', team: 'Senior Men\'s Team', position: 'Forward', last: '昨天 16:20', metric: '51.2 cm', status: 'normal', change: '+2.1%' },
-  { name: 'Zhao Rui', initials: 'ZR', team: 'U21', position: 'Midfielder', last: '昨天 15:04', metric: '46.8 cm', status: 'normal', change: '+6.7%' },
-]
-
-const statusMap = {
-  normal: { label: '正常', className: 'status-normal' },
-  warning: { label: '关注', className: 'status-warning' },
-  attention: { label: '需处理', className: 'status-attention' },
-  offline: { label: '离线', className: 'status-offline' },
-}
-
-function StatusBadge({ status }: { status: keyof typeof statusMap }) {
-  const item = statusMap[status]
-  return <span className={`status-badge ${item.className}`}><span className="status-dot" />{item.label}</span>
-}
-
-function Logo() {
-  return <div className="brand-mark"><span /><span /><span /></div>
-}
 
 function Sidebar({ view, setView }: { view: View; setView: (view: View) => void }) {
   const primary = [
@@ -102,20 +67,9 @@ function Topbar({ view, setView }: { view: View; setView: (view: View) => void }
   return <header className="topbar"><div className="mobile-brand"><Logo /><strong>KUNWEI</strong></div><div className="page-heading"><h1>{titles[view][0]}</h1><span>{titles[view][1]}</span></div><div className="top-actions"><label className="global-search"><Search size={17} /><input placeholder="搜索运动员、测试..." aria-label="全局搜索" /></label><button className="icon-button" aria-label="通知"><Bell size={18} /><i /></button><button className="icon-button help" aria-label="帮助"><CircleHelp size={18} /></button><div className="top-user"><div className="user-avatar small">JW</div><ChevronDown size={14} /></div></div></header>
 }
 
-function MetricCard({ label, value, unit, trend, trendClass = 'up', icon: Icon }: { label: string; value: string; unit?: string; trend: string; trendClass?: string; icon: typeof Activity }) {
-  return <article className="metric-card"><div className="metric-top"><span>{label}</span><div className="metric-icon"><Icon size={16} /></div></div><div className="metric-value">{value}<small>{unit}</small></div><div className={`metric-trend ${trendClass}`}>{trend}</div></article>
-}
-
-function TrendChart({ compact = false }: { compact?: boolean }) {
-  return <div className={`trend-chart ${compact ? 'compact' : ''}`}><div className="chart-grid"><svg viewBox="0 0 700 190" preserveAspectRatio="none" role="img" aria-label="CMJ 跳高趋势图"><path d="M0 150 C45 132, 70 145, 110 118 S175 125, 210 105 S265 117, 300 88 S360 105, 400 94 S450 75, 495 82 S540 60, 580 68 S630 48, 700 42" fill="none" stroke="#1d8a78" strokeWidth="3" /><path d="M0 150 C45 132, 70 145, 110 118 S175 125, 210 105 S265 117, 300 88 S360 105, 400 94 S450 75, 495 82 S540 60, 580 68 S630 48, 700 42 L700 190 L0 190Z" fill="url(#area)" opacity=".28" /><defs><linearGradient id="area" x1="0" x2="0" y1="0" y2="1"><stop stopColor="#1d8a78" /><stop offset="1" stopColor="#1d8a78" stopOpacity="0" /></linearGradient></defs></svg></div>{!compact && <div className="chart-labels"><span>01 Sep</span><span>08 Sep</span><span>15 Sep</span><span>22 Sep</span><span>29 Sep</span></div>}</div>
-}
-
 function HomeView({ setView }: { setView: (view: View) => void }) {
   return <div className="content"><div className="welcome-row"><div><div className="eyebrow">MONDAY, 29 SEP 2026</div><h2>早上好，Alex</h2><p>这是今天团队表现的概览。以下运动员可能需要你的关注。</p></div><button className="primary-button" onClick={() => setView('testing')}><Plus size={17} />开始测试</button></div><div className="metric-grid"><MetricCard label="运动员" value="32" trend="+2 本月" icon={Users} /><MetricCard label="本周已测试" value="28" trend="87.5% 覆盖率" icon={ClipboardList} /><MetricCard label="需要关注" value="4" trend="较上周 −1" trendClass="down" icon={AlertTriangle} /><MetricCard label="今日测试" value="16" trend="+4 较昨日" icon={Zap} /></div><div className="home-grid"><section className="panel attention-panel"><div className="panel-heading"><div><h3>需要关注</h3><span>基于个人基线与阈值</span></div><button className="text-button" onClick={() => setView('athletes')}>查看全部 <ChevronRight size={15} /></button></div><div className="attention-list"><AttentionRow athlete="Zhang Wei" metric="CMJ 跳高" detail="较基线下降 12.4%" status="attention" /><AttentionRow athlete="Li Ming" metric="双侧不对称" detail="13.2% · 高于阈值" status="warning" /><AttentionRow athlete="Chen Jie" metric="测试逾期" detail="已有 14 天未完成测试" status="attention" /></div></section><section className="panel recent-panel"><div className="panel-heading"><div><h3>最近测试</h3><span>今天 · 3 个已完成</span></div><button className="icon-button"><MoreHorizontal size={18} /></button></div><div className="recent-list"><RecentRow time="09:42" name="Zhang Wei" test="CMJ" result="52.4 cm" /><RecentRow time="09:37" name="Li Ming" test="IMTP" result="2,980 N" /><RecentRow time="09:15" name="Wang Hao" test="CMJ" result="48.1 cm" /></div></section></div><section className="panel trend-panel"><div className="panel-heading"><div><h3>团队趋势</h3><span>CMJ 跳高 · Senior Men's Team · 最近 30 天 · 单位：cm</span></div><button className="filter-button">CMJ 跳高 <ChevronDown size={15} /></button></div><div className="chart-summary"><strong>48.2 <small>cm</small></strong><span className="positive">↑ 3.4% <small>vs 上一周期</small></span></div><TrendChart /></section></div>
 }
-
-function AttentionRow({ athlete, metric, detail, status }: { athlete: string; metric: string; detail: string; status: 'attention' | 'warning' }) { return <div className="attention-row"><div className="athlete-avatar">{athlete.split(' ').map(v => v[0]).join('')}</div><div className="row-main"><strong>{athlete}</strong><span>{metric}</span></div><div className="row-detail">{detail}</div><StatusBadge status={status} /><ChevronRight size={16} className="muted-icon" /></div> }
-function RecentRow({ time, name, test, result }: { time: string; name: string; test: string; result: string }) { return <div className="recent-row"><span className="time">{time}</span><strong>{name}</strong><span className="test-pill">{test}</span><span className="result">{result}</span><ChevronRight size={15} className="muted-icon" /></div> }
 
 function AthletesView({ setView }: { setView: (view: View) => void }) {
   const [query, setQuery] = useState('')
@@ -127,7 +81,7 @@ function ProtocolLibraryView({ setView }: { setView: (view: View) => void }) {
   const [query, setQuery] = useState('')
   const [sport, setSport] = useState('全部')
   const filtered = protocols.filter(protocol => protocol.name.toLowerCase().includes(query.toLowerCase()) && (sport === '全部' || protocol.category === sport))
-  return <div className="content"><div className="page-actions"><div><div className="eyebrow">PROTOCOL-DRIVEN TEST LIBRARY</div><h2>测试协议库</h2><p>从数百个协议中选择，Hub 会根据协议自动生成采集、指标和报告界面。</p></div><button className="primary-button" onClick={() => setView('testing')}><Plus size={17} />开始测试</button></div><section className="panel library-panel"><div className="library-toolbar"><label className="table-search"><Search size={17} /><input value={query} onChange={event => setQuery(event.target.value)} placeholder="搜索协议名称、运动或指标" /></label><div className="filter-group"><button className={`filter-button ${sport === '全部' ? 'selected-filter' : ''}`} onClick={() => setSport('全部')}>全部</button><button className={`filter-button ${sport === '跳跃' ? 'selected-filter' : ''}`} onClick={() => setSport('跳跃')}>跳跃</button><button className={`filter-button ${sport === '短跑' ? 'selected-filter' : ''}`} onClick={() => setSport('短跑')}>短跑</button><button className={`filter-button ${sport === '游泳' ? 'selected-filter' : ''}`} onClick={() => setSport('游泳')}>游泳</button><button className={`filter-button ${sport === '力量' ? 'selected-filter' : ''}`} onClick={() => setSport('力量')}>力量</button></div></div><div className="protocol-grid">{filtered.map(protocol => <article className="protocol-card" key={protocol.name}><div className="protocol-card-top"><div className="card-icon teal"><protocol.icon size={20} /></div><span className="protocol-sport">{protocol.sport}</span></div><h3>{protocol.name}</h3><p>{protocol.description}</p><div className="protocol-meta"><span>{protocol.source}</span><span>{protocol.metrics.length} 个指标</span></div><div className="protocol-tags">{protocol.metrics.map(metric => <span key={metric}>{metric}</span>)}</div><button className="secondary-button full-button" onClick={() => setView('testing')}>使用此协议 <ChevronRight size={15} /></button></article>)}</div></section></div>
+  return <div className="content"><div className="page-actions"><div><div className="eyebrow">PROTOCOL-DRIVEN TEST LIBRARY</div><h2>测试协议库</h2><p>从数百个协议中选择，Hub 会根据协议自动生成采集、指标和报告界面。</p></div><button className="primary-button" onClick={() => setView('testing')}><Plus size={17} />开始测试</button></div><section className="panel library-panel"><div className="library-toolbar"><label className="table-search"><Search size={17} /><input value={query} onChange={event => setQuery(event.target.value)} placeholder="搜索协议名称、运动或指标" /></label><div className="filter-group"><button className={`filter-button ${sport === '全部' ? 'selected-filter' : ''}`} onClick={() => setSport('全部')}>全部</button><button className={`filter-button ${sport === '跳跃' ? 'selected-filter' : ''}`} onClick={() => setSport('跳跃')}>跳跃</button><button className={`filter-button ${sport === '短跑' ? 'selected-filter' : ''}`} onClick={() => setSport('短跑')}>短跑</button><button className={`filter-button ${sport === '游泳' ? 'selected-filter' : ''}`} onClick={() => setSport('游��')}>游泳</button><button className={`filter-button ${sport === '力量' ? 'selected-filter' : ''}`} onClick={() => setSport('力量')}>力量</button></div></div><div className="protocol-grid">{filtered.map(protocol => <article className="protocol-card" key={protocol.name}><div className="protocol-card-top"><div className="card-icon teal"><protocol.icon size={20} /></div><span className="protocol-sport">{protocol.sport}</span></div><h3>{protocol.name}</h3><p>{protocol.description}</p><div className="protocol-meta"><span>{protocol.source}</span><span>{protocol.metrics.length} 个指标</span></div><div className="protocol-tags">{protocol.metrics.map(metric => <span key={metric}>{metric}</span>)}</div><button className="secondary-button full-button" onClick={() => setView('testing')}>使用此协议 <ChevronRight size={15} /></button></article>)}</div></section></div>
 }
 
 function TestingView({ setView }: { setView: (view: View) => void }) {
