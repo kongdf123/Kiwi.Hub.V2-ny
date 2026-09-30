@@ -35,9 +35,10 @@ import {
 } from 'lucide-react'
 import { AttentionRow, Logo, MetricCard, RecentRow, StatusBadge, TrendChart } from './kunwei-hub/shared'
 import { athletes, protocols, statusMap, type View } from './kunwei-hub/types'
+import { Sidebar, Topbar } from './kunwei-hub/navigation'
 
 
-function Sidebar({ view, setView }: { view: View; setView: (view: View) => void }) {
+function LegacySidebar({ view, setView }: { view: View; setView: (view: View) => void }) {
   const primary = [
     { id: 'home' as View, label: '首页', icon: LayoutDashboard },
     { id: 'sessions' as View, label: '测试会话', icon: ClipboardList },
@@ -62,7 +63,7 @@ function Sidebar({ view, setView }: { view: View; setView: (view: View) => void 
   </aside>
 }
 
-function Topbar({ view, setView }: { view: View; setView: (view: View) => void }) {
+function LegacyTopbar({ view, setView }: { view: View; setView: (view: View) => void }) {
   const titles: Record<View, [string, string]> = { home: ['首页', '中央数据平台概览'], athletes: ['运动员', '统一查看跨项目表现'], testing: ['采集入口', '选择运动员、协议与数据源，开始一次 Hub 测试'], library: ['测试协议库', 'Protocol-driven test library · 适配不同运动、数据结构与来源'], sessions: ['测试会话', '所有来源的原始数据、处理与分析状态'], dashboard: ['分析仪表盘', 'Senior Men\'s Team · 最近 30 天'], reports: ['报告', '生成和管理表现报告'], sync: ['同步中心', '追踪接收、验证、处理与发布'], sources: ['数据源', '管理客户端、设备与合作伙伴系统'], api: ['API 集成', '版本化 API 与事件通知'], management: ['管理中心', '组织、用户、设备与协议'] }
   return <header className="topbar"><div className="mobile-brand"><Logo /><strong>KUNWEI</strong></div><div className="page-heading"><h1>{titles[view][0]}</h1><span>{titles[view][1]}</span></div><div className="top-actions"><label className="global-search"><Search size={17} /><input placeholder="搜索运动员、测试..." aria-label="全局搜索" /></label><button className="icon-button" aria-label="通知"><Bell size={18} /><i /></button><button className="icon-button help" aria-label="帮助"><CircleHelp size={18} /></button><div className="top-user"><div className="user-avatar small">JW</div><ChevronDown size={14} /></div></div></header>
 }
@@ -110,7 +111,7 @@ function ManagementView() { return <div className="content"><div className="page
 
 export default function KunweiHub() {
   const [view, setView] = useState<View>('home')
-  return <div className="app-shell"><Sidebar view={view} setView={setView} /><div className="main-area"><Topbar view={view} setView={setView} /><main>{view === 'home' && <HomeView setView={setView} />}{view === 'athletes' && <AthletesView setView={setView} />}{view === 'testing' && <TestingView setView={setView} />}{view === 'library' && <ProtocolLibraryView setView={setView} />}{view === 'sessions' && <SessionsView setView={setView} />}{view === 'dashboard' && <DashboardView />}{view === 'reports' && <ReportsView />}{view === 'sync' && <SyncView />}{view === 'sources' && <SourcesView setView={setView} />}{view === 'api' && <ApiView />}{view === 'management' && <ManagementView />}</main></div><button className="mobile-menu" aria-label="打开菜单"><Menu size={20} /></button></div>
+  return <div className="app-shell"><Sidebar view={view} setView={setView} /><div className="main-area"><Topbar view={view} /><main>{view === 'home' && <HomeView setView={setView} />}{view === 'athletes' && <AthletesView setView={setView} />}{view === 'testing' && <TestingView setView={setView} />}{view === 'library' && <ProtocolLibraryView setView={setView} />}{view === 'sessions' && <SessionsView setView={setView} />}{view === 'dashboard' && <DashboardView />}{view === 'reports' && <ReportsView />}{view === 'sync' && <SyncView />}{view === 'sources' && <SourcesView setView={setView} />}{view === 'api' && <ApiView />}{view === 'management' && <ManagementView />}</main></div><button className="mobile-menu" aria-label="打开菜单"><Menu size={20} /></button></div>
 }
 
 export { KunweiHub }
