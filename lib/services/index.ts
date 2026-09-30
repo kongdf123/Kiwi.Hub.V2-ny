@@ -1,30 +1,45 @@
 import { athleteRecords, athleteTimeline, getAthlete, getProtocol, getResult, getSession, protocolDefinitions, results, sessionRecords, mockServices as legacyServices } from '@/lib/models/domain'
 import type { ReportRequest } from '@/lib/models/result'
 import type { DataSource, Integration } from '@/lib/models/device'
+import type { TestSession } from '@/lib/models/test-session'
+
+const testSessions = sessionRecords
 
 export const athleteService = {
   list: async () => athleteRecords,
+  listSync: () => athleteRecords,
   get: async (id: string) => getAthlete(id),
+  getSync: (id: string) => getAthlete(id),
   profile: async (id: string) => {
     const athlete = getAthlete(id)
     return athlete ? { ...athlete, timeline: athleteTimeline(id) } : undefined
+  },
+  profileSync: (id: string) => {
+    const athlete = getAthlete(id)
+    return athlete ? { athlete, timeline: athleteTimeline(id) } : undefined
   },
 }
 
 export const protocolService = {
   list: async () => protocolDefinitions,
+  listSync: () => protocolDefinitions,
   get: async (id: string) => getProtocol(id),
+  getSync: (id: string) => getProtocol(id),
 }
 
 export const testSessionService = {
-  list: async () => sessionRecords,
+  list: async () => testSessions,
+  listSync: () => testSessions,
   get: async (id: string) => getSession(id),
-  create: async (session: (typeof sessionRecords)[number]) => session,
+  getSync: (id: string) => getSession(id),
+  create: async (session: TestSession) => session,
 }
 
 export const resultService = {
   get: async (sessionId: string) => getResult(sessionId),
   forProtocol: async (sessionId: string) => getResult(sessionId),
+  getSync: (sessionId: string) => getResult(sessionId),
+  forProtocolSync: (sessionId: string, _protocolId?: string) => getResult(sessionId),
 }
 
 export const reportService = {

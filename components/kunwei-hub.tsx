@@ -40,6 +40,7 @@ import { Sidebar, Topbar } from './kunwei-hub/navigation'
 import { UsersView } from './kunwei-hub/users'
 import { AthletesFeature } from './kunwei-hub/athletes'
 import { SessionsFeature } from './kunwei-hub/sessions'
+import { TestingFeature } from './kunwei-hub/testing'
 
 
 function LegacySidebar({ view, setView }: { view: View; setView: (view: View) => void }) {
@@ -147,7 +148,7 @@ function ManagementView({ setView }: { setView: (view: View) => void }) {
 export default function KunweiHub() {
   const [view, setView] = useState<View>('home')
   const handleLogout = () => { window.location.href = '/login' }
-  return <div className="app-shell"><Sidebar view={view} setView={setView} onLogout={handleLogout} /><div className="main-area"><Topbar view={view} onLogout={handleLogout} /><main>{view === 'home' && <HomeView setView={setView} />}{view === 'athletes' && <AthletesFeature setView={setView} />}{view === 'testing' && <TestingView setView={setView} />}{view === 'library' && <ProtocolLibraryView setView={setView} />}{view === 'sessions' && <SessionsFeature setView={setView} />}{view === 'dashboard' && <DashboardView />}{view === 'reports' && <ReportsView />}{view === 'sync' && <SyncView />}{view === 'sources' && <SourcesView setView={setView} />}{view === 'api' && <ApiView />}{view === 'management' && <ManagementView setView={setView} />}{view === 'users' && <UsersView onBack={() => setView('management')} />}</main></div><button className="mobile-menu" aria-label="打开菜单"><Menu size={20} /></button></div>
+  return <div className="app-shell"><Sidebar view={view} setView={setView} onLogout={handleLogout} /><div className="main-area"><Topbar view={view} onLogout={handleLogout} /><main>{view === 'home' && <HomeView setView={setView} />}{view === 'athletes' && <AthletesFeature setView={setView} />}{view === 'testing' && <TestingFeature setView={setView} />}{view === 'library' && <ProtocolLibraryView setView={setView} />}{view === 'sessions' && <SessionsFeature setView={setView} />}{view === 'dashboard' && <DashboardView />}{view === 'reports' && <ReportsView />}{view === 'sync' && <SyncView />}{view === 'sources' && <SourcesView setView={setView} />}{view === 'api' && <ApiView />}{view === 'management' && <ManagementView setView={setView} />}{view === 'users' && <UsersView onBack={() => setView('management')} />}</main></div><button className="mobile-menu" aria-label="打开菜单"><Menu size={20} /></button></div>
 }
 
 export { KunweiHub }
