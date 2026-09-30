@@ -1,17 +1,24 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { ArrowRight, Eye, EyeOff, LockKeyhole, Mail, ShieldCheck } from 'lucide-react'
 import { Logo } from './shared'
 
 export default function LoginPage() {
+  const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [remember, setRemember] = useState(true)
   const [notice, setNotice] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setNotice('演示模式：登录请求已提交')
+    setIsSubmitting(true)
+    setNotice('正在验证工作区…')
+    window.setTimeout(() => {
+      router.push('/')
+    }, 350)
   }
 
   return (
@@ -35,7 +42,7 @@ export default function LoginPage() {
             <label className="login-field"><span>工作邮箱</span><div className="input-wrap"><Mail size={17} /><input type="email" placeholder="name@company.com" autoComplete="email" required /></div></label>
             <label className="login-field"><span>密码</span><div className="input-wrap"><LockKeyhole size={17} /><input type={showPassword ? 'text' : 'password'} placeholder="输入你的密码" autoComplete="current-password" minLength={6} required /><button type="button" className="password-toggle" onClick={() => setShowPassword(value => !value)} aria-label={showPassword ? '隐藏密码' : '显示密码'}>{showPassword ? <EyeOff size={17} /> : <Eye size={17} />}</button></div></label>
             <div className="login-options"><label className="remember-option"><input type="checkbox" checked={remember} onChange={event => setRemember(event.target.checked)} /><span>记住我</span></label><a href="#forgot">忘记密码？</a></div>
-            <button className="login-submit" type="submit">登录工作区 <ArrowRight size={17} /></button>
+            <button className="login-submit" type="submit" disabled={isSubmitting}>{isSubmitting ? '正在登录…' : '登录工作区'} {!isSubmitting && <ArrowRight size={17} />}</button>
             {notice && <p className="login-notice" role="status">{notice}</p>}
           </form>
           <div className="login-divider"><span>或</span></div>
