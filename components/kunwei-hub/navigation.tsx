@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { BarChart3, Bell, CircleHelp, ClipboardList, Code2, Database, ChevronDown, ChevronRight, FileText, Layers3, LayoutDashboard, LogOut, MoreHorizontal, RefreshCw, Search, Settings2, Users, Wifi } from 'lucide-react'
+import { BarChart3, Bell, CircleHelp, ClipboardList, Code2, Database, ChevronDown, ChevronRight, FileText, FileUp, Layers3, LayoutDashboard, LogOut, MoreHorizontal, RefreshCw, Search, Settings2, Users, Wifi } from 'lucide-react'
 import { Logo } from './shared'
 import type { View } from './types'
 
@@ -9,6 +9,7 @@ export function Sidebar({ view, setView, onLogout }: { view: View; setView: (vie
   const primary = [
     { id: 'home' as View, label: '首页', icon: LayoutDashboard },
     { id: 'sessions' as View, label: '测试会话', icon: ClipboardList },
+    { id: 'testing' as View, label: '数据接收', icon: FileUp },
     { id: 'library' as View, label: '测试协议库', icon: Layers3 },
     { id: 'athletes' as View, label: '运动员', icon: Users },
     { id: 'dashboard' as View, label: '分析仪表盘', icon: BarChart3 },
@@ -28,7 +29,7 @@ export function Sidebar({ view, setView, onLogout }: { view: View; setView: (vie
 export function Topbar({ view, onLogout }: { view: View; onLogout: () => void }) {
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const userMenuRef = useRef<HTMLDivElement>(null)
-  const titles: Record<View, [string, string]> = { home: ['首页', '中央数据平台概览'], athletes: ['运动员', '统一查看跨项目表现'], testing: ['采集入口', '选择运动员、协议与数据源，开始一次 Hub 测试'], library: ['测试协议库', 'Protocol-driven test library · 适配不同运动、数据结构与来源'], sessions: ['测试会话', '所有来源的原始数据、处理与分析状态'], dashboard: ['分析仪表盘', 'Senior Men\'s Team · 最近 30 天'], reports: ['报告', '生成和管理表现报告'], sync: ['同步中心', '追踪接收、验证、处理与发布'], sources: ['数据源', '管理客户端、设备与合作伙伴系统'], api: ['API 集成', '版本化 API 与事件通知'], management: ['管理中心', '组织、用户、设备与协议'], users: ['用户与权限', '成员、角色与数据访问范围'] }
+  const titles: Record<View, [string, string]> = { home: ['首页', '中央数据平台概览'], athletes: ['运动员', '统一查看跨项目表现'], testing: ['数据接收', '接收客户端提交的测量会话并查看处理状态'], library: ['测试协议库', 'Protocol-driven test library · 适配不同运动、数据结构与来源'], sessions: ['测试会话', '所有来源的原始数据、处理与分析状态'], dashboard: ['分析仪表盘', 'Senior Men\'s Team · 最近 30 天'], reports: ['报告', '生成和管理表现报告'], sync: ['同步中心', '追踪接收、验证、处理与发布'], sources: ['数据源', '管理客户端、设备与合作伙伴系统'], api: ['API 集成', '版本化 API 与事件通知'], management: ['管理中心', '组织、用户、设备与协议'], users: ['用户与权限', '成员、角色与数据访问范围'] }
 
   useEffect(() => {
     const closeMenu = (event: MouseEvent) => {
